@@ -1,2 +1,2 @@
-FROM alpharubie/alpharubierepo:latest
-
+FROM nginx:latest
+COPY index.html /usr/share/nginx/html/
