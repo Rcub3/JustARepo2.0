@@ -23,12 +23,16 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Convert repository name to lowercase
+      id: repo_name
+      run: echo "::set-output name=repo_name::${{ github.repository_owner }}/$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]_-.')"
+
     - name: Build and tag the Docker image
       run: |
-        docker build -t ghcr.io/${{ github.repository }}/my-nginx-image:latest . # Bouw de Docker image en tag deze met 'latest'
-        docker tag ghcr.io/${{ github.repository }}/my-nginx-image:latest ghcr.io/${{ github.repository }}/my-nginx-image:${{ github.sha }} # Tag de gebouwde image met de huidige GitHub commit SHA
+        docker build -t ghcr.io/${{ steps.repo_name.outputs.repo_name }}/my-nginx-image:latest . # Bouw de Docker image en tag deze met 'latest'
+        docker tag ghcr.io/${{ steps.repo_name.outputs.repo_name }}/my-nginx-image:latest ghcr.io/${{ steps.repo_name.outputs.repo_name }}/my-nginx-image:${{ github.sha }} # Tag de gebouwde image met de huidige GitHub commit SHA
 
-    - name: Push the Docker image # push the image naar de registry
+    - name: Push the Docker image
       run: |
-        docker push ghcr.io/${{ github.repository }}/my-nginx-image:latest # Push de Docker image getagd met 'latest' naar GitHub Container Registry
-        docker push ghcr.io/${{ github.repository }}/my-nginx-image:${{ github.sha }} # Push de Docker image getagd met de GitHub commit SHA naar GitHub Container Registry
+        docker push ghcr.io/${{ steps.repo_name.outputs.repo_name }}/my-nginx-image:latest # Push de Docker image getagd met 'latest' naar GitHub Container Registry
+        docker push ghcr.io/${{ steps.repo_name.outputs.repo_name }}/my-nginx-image:${{ github.sha }} # Push de Docker image getagd met de GitHub commit SHA naar GitHub Container Registry
