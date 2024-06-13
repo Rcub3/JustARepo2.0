@@ -28,7 +28,7 @@ jobs:
         docker build -t ghcr.io/${{ github.repository }}/my-nginx-image:latest . # Bouw de Docker image en tag deze met 'latest'
         docker tag ghcr.io/${{ github.repository }}/my-nginx-image:latest ghcr.io/${{ github.repository }}/my-nginx-image:${{ github.sha }} # Tag de gebouwde image met de huidige GitHub commit SHA
 
-    - name: Push the Docker image
+    - name: Push the Docker image # push the image naar de registry
       run: |
         docker push ghcr.io/${{ github.repository }}/my-nginx-image:latest # Push de Docker image getagd met 'latest' naar GitHub Container Registry
         docker push ghcr.io/${{ github.repository }}/my-nginx-image:${{ github.sha }} # Push de Docker image getagd met de GitHub commit SHA naar GitHub Container Registry
