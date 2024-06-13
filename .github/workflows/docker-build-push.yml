@@ -16,18 +16,19 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2 # Stel Docker Buildx in, wat handig is voor het bouwen van multi-platform images
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2 # Gebruik de Docker login actie om in te loggen bij Docker Hub
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2 # Gebruik de Docker login actie om in te loggen bij GitHub Container Registry
       with:
-        username: ${{ secrets.DOCKER_USERNAME }} # Gebruik de Docker Hub gebruikersnaam uit GitHub secrets
-        password: ${{ secrets.DOCKER_PASSWORD }} # Gebruik het Docker Hub wachtwoord uit GitHub secrets
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build and tag the Docker image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest . # Bouw de Docker image en tag deze met 'latest'
-        docker tag ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:${{ github.sha }} # Tag de gebouwde image met de huidige GitHub commit SHA
+        docker build -t ghcr.io/${{ github.repository }}/my-nginx-image:latest . # Bouw de Docker image en tag deze met 'latest'
+        docker tag ghcr.io/${{ github.repository }}/my-nginx-image:latest ghcr.io/${{ github.repository }}/my-nginx-image:${{ github.sha }} # Tag de gebouwde image met de huidige GitHub commit SHA
 
     - name: Push the Docker image
       run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:latest # Push de Docker image getagd met 'latest' naar Docker Hub
-        docker push ${{ secrets.DOCKER_USERNAME }}/my-nginx-image:${{ github.sha }} # Push de Docker image getagd met de GitHub commit SHA naar Docker Hub
+        docker push ghcr.io/${{ github.repository }}/my-nginx-image:latest # Push de Docker image getagd met 'latest' naar GitHub Container Registry
+        docker push ghcr.io/${{ github.repository }}/my-nginx-image:${{ github.sha }} # Push de Docker image getagd met de GitHub commit SHA naar GitHub Container Registry
